@@ -21,7 +21,7 @@ exports.up = (pgm) => {
   pgm.addConstraint('user_album_likes', 'fk_user_album_likes_playlist', {
     foreignKeys: {
       columns: 'user_id',
-      references: 'playlists(id)',
+      references: 'users(id)',
       onDelete: 'cascade',
     },
   });
@@ -30,7 +30,7 @@ exports.up = (pgm) => {
   pgm.addConstraint('user_album_likes', 'fk_user_album_likes_songs', {
     foreignKeys: {
       columns: 'album_id',
-      references: 'songs(id)',
+      references: 'albums(id)',
       onDelete: 'cascade',
     },
   });
