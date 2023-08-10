@@ -31,8 +31,14 @@ class AlbumHandler {
     const album = await this.service.getAlbumById(id);
     const songs = await this.service.getSongByAlbum(id);
 
-    if (songs === null) album.songs = [];
-    else album.songs = songs;
+    if (album.cover === null) {
+      if (songs === null) album.songs = [];
+      else album.songs = songs;
+    }
+
+    // Melakukan remap pada bagian cover menjadi coverUrl
+    album.coverUrl = album.cover;
+    delete album.cover;
 
     return {
       status: 'success',

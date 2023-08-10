@@ -2,6 +2,7 @@ require('dotenv').config();
 // Ekstension
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
 
 // Albums
 const albums = require('./api/albums');
@@ -36,6 +37,16 @@ const collaborations = require('./api/collaborations');
 const CollaborationsServices = require('./service/postgres/CollaborationsService');
 const CollaborationsValidator = require('./validator/collaborations');
 
+// Exports
+const exportse = require('./api/exports');
+const ProducerService = require('./service/rabbitmq/ProducerService');
+const ExportPlaylistsValidator = require('./validator/exports');
+
+// Uploads
+const uploads = require('./api/uploads');
+const StorageService = require('./service/S3/StorageService');
+const UploadsValidator = require('./validator/uploads');
+
 // Token
 const TokenManager = require('./tokenize/TokenManager');
 
@@ -50,6 +61,7 @@ const init = async () => {
   const playlistsService = new PlaylistsService(collaborationsService);
   const activitiesService = new ActivitiesService();
   const authenticationsService = new AuthenticationsServices();
+  const storageService = new StorageService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -64,6 +76,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ]);
 
@@ -131,6 +146,22 @@ const init = async () => {
         usersService,
         playlistsService,
         validator: CollaborationsValidator,
+      },
+    },
+    {
+      plugin: exportse,
+      options: {
+        producerService: ProducerService,
+        playlistsService,
+        validator: ExportPlaylistsValidator,
+      },
+    },
+    {
+      plugin: uploads,
+      options: {
+        storageService,
+        albumsService,
+        validator: UploadsValidator,
       },
     },
   ]);
