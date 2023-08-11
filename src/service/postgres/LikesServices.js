@@ -23,7 +23,7 @@ class LikesService {
     if (!result.rows[0].id) {
       throw new InvariantError('Gagal menambahkan like');
     }
-    await this.cacheService.delete('like');
+    await this.cacheService.delete(`albums:${albumId}`);
     return result.rows[0].id;
   }
 
@@ -39,12 +39,12 @@ class LikesService {
     if (!result.rowCount) {
       throw new InvariantError('Gagal menghapus like');
     }
-    await this.cacheService.delete('like');
+    await this.cacheService.delete(`albums:${albumId}`);
   }
 
   async getLike(albumId) {
     try {
-      const result = await this.cacheService.get('like');
+      const result = await this.cacheService.get(`albums:${albumId}`);
       return { likes: parseInt(result, 10), cache: true };
     } catch (error) {
       this.albumsService.getAlbumById(albumId);
@@ -60,7 +60,7 @@ class LikesService {
         throw new InvariantError('Gagal menghapus like');
       }
       const integerResult = parseInt(result.rows[0].count, 10);
-      await this.cacheService.set('like', JSON.stringify(integerResult));
+      await this.cacheService.set(`albums:${albumId}`, JSON.stringify(integerResult));
       return { likes: integerResult, cache: false };
     }
   }
